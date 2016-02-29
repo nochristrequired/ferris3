@@ -6,3 +6,4 @@ docs/_build
 .DS_Store
 .coverage
 env
+.nox
