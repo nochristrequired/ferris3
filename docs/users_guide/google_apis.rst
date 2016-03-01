@@ -14,16 +14,6 @@ Building Clients
 As demonstrated, valid credentials can be obtained with the help of :mod:`ferris3.oauth2` or with any valid credentials from Google's `oauth2client <https://developers.google.com/api-client-library/python/guide/aaa_oauth>`_.
 
 
-Exponential Backoff
--------------------
-
-Google recommends using `exponential backoff <https://developers.google.com/drive/web/handle-errors>`_ when making API requests. This is especially important when making lots of calls. The helper provides a couple of utilities for this purpose.
-
-.. autofunction:: retry_execute
-
-.. autofunction:: retries
-
-
 Discovery Document Caching
 --------------------------
 
