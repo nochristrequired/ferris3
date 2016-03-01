@@ -5,21 +5,6 @@ import mock
 
 class GoogleApisTest(AppEngineTest):
 
-    def test_discovery_doc_caching(self):
-        http_patch = mock.patch('httplib2.Http.request', return_value=(200, 'test'))
-        with http_patch as http:
-            doc = google_apis._get_discovery_document('test', 'v1')
-            assert doc == 'test'
-            assert http.call_count == 1
-
-            doc = google_apis._get_discovery_document('test', 'v1')
-            assert doc == 'test'
-            assert http.call_count == 1
-
-            doc = google_apis._get_discovery_document('meep', 'v1')
-            assert doc == 'test'
-            assert http.call_count == 2
-
     def test_client_caching(self):
         from contextlib import nested
 
