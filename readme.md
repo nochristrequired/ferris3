@@ -1,4 +1,7 @@
-# Ferris 3 [![Build Status](https://drone.io/github.com/jonparrott/ferris3/status.png)](https://drone.io/github.com/jonparrott/ferris3/latest)
+# Ferris 3
+
+[![Build Status](https://travis-ci.org/jonparrott/ferris3.svg?branch=master)](https://travis-ci.org/jonparrott/ferris3)
+[![codecov.io](https://codecov.io/github/jonparrott/ferris3/coverage.svg?branch=master)](https://codecov.io/github/jonparrott/ferris3?branch=master)
 
 **Ferris 3** is a collection of flexible utilities for Google App Engine Python.
 
