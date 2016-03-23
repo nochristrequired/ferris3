@@ -38,8 +38,10 @@ try:
 except ImportError:
     SignedJwtAssertionCredentials = None
 
-from oauth2client.appengine import StorageByKeyName, CredentialsNDBProperty
-
+try:
+    from oauth2client.contrib.appengine import StorageByKeyName, CredentialsNDBProperty
+except ImportError:
+    from oauth2client.appengine import StorageByKeyName, CredentialsNDBProperty
 
 def build_service_account_credentials(scope, user=None):
     """
