@@ -4,7 +4,6 @@ import hashlib
 import endpoints
 import os
 from oauth2client.client import AccessTokenCredentials
-from oauth2client.service_account import ServiceAccountCredentials
 
 
 def get_endpoints_credentials():
@@ -35,11 +34,6 @@ def _get_config():
 
 
 try:
-    from oauth2client.client import SignedJwtAssertionCredentials
-except ImportError:
-    SignedJwtAssertionCredentials = None
-
-try:
     from oauth2client.contrib.appengine import StorageByKeyName, CredentialsNDBProperty
 except ImportError:
     from oauth2client.appengine import StorageByKeyName, CredentialsNDBProperty
@@ -50,14 +44,20 @@ def build_service_account_credentials(scope, user=None):
     and masquerading as the provided user.
     """
     config = _get_config()
+    try:
+        from oauth2client.service_account import ServiceAccountCredentials
+    except ImportError:
+        ServiceAccountCredentials = None
 
-    if hasattr(ServiceAccountCredentials, "from_json_keyfile_dict"):
+    if ServiceAccountCredentials is not None and hasattr(ServiceAccountCredentials, "from_json_keyfile_dict"):
         # running oauth2client version 2.0
         creds = ServiceAccountCredentials.from_json_keyfile_dict(config, scope)
         if user is not None:
             creds = creds.create_delegated(user)
     else:
-        if not SignedJwtAssertionCredentials:
+        try:
+            from oauth2client.client import SignedJwtAssertionCredentials
+        except ImportError:
             raise EnvironmentError("Service account can not be used because PyCrypto is not available. Please install PyCrypto.")
 
         if not isinstance(scope, (list, tuple)):
