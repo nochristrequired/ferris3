@@ -34,34 +34,43 @@ def _get_config():
 
 
 try:
-    from oauth2client.client import SignedJwtAssertionCredentials
+    from oauth2client.contrib.appengine import StorageByKeyName, CredentialsNDBProperty
 except ImportError:
-    SignedJwtAssertionCredentials = None
-
-from oauth2client.appengine import StorageByKeyName, CredentialsNDBProperty
-
+    from oauth2client.appengine import StorageByKeyName, CredentialsNDBProperty
 
 def build_service_account_credentials(scope, user=None):
     """
     Builds service account credentials using the configuration stored in :mod:`~ferris3.settings`
     and masquerading as the provided user.
     """
-    if not SignedJwtAssertionCredentials:
-        raise EnvironmentError("Service account can not be used because PyCrypto is not available. Please install PyCrypto.")
-
     config = _get_config()
+    try:
+        from oauth2client.service_account import ServiceAccountCredentials
+    except ImportError:
+        ServiceAccountCredentials = None
 
-    if not isinstance(scope, (list, tuple)):
-        scope = [scope]
+    if ServiceAccountCredentials is not None and hasattr(ServiceAccountCredentials, "from_json_keyfile_dict"):
+        # running oauth2client version 2.0
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(config, scope)
+        if user is not None:
+            creds = creds.create_delegated(user)
+    else:
+        try:
+            from oauth2client.client import SignedJwtAssertionCredentials
+        except ImportError:
+            raise EnvironmentError("Service account can not be used because PyCrypto is not available. Please install PyCrypto.")
+
+        if not isinstance(scope, (list, tuple)):
+            scope = [scope]
+
+        creds = SignedJwtAssertionCredentials(
+            service_account_name=config['client_email'],
+            private_key=config['private_key'],
+            scope=scope,
+            prn=user)
 
     key = _generate_storage_key(config['client_email'], scope, user)
     storage = StorageByKeyName(ServiceAccountStorage, key, 'credentials')
-
-    creds = SignedJwtAssertionCredentials(
-        service_account_name=config['client_email'],
-        private_key=config['private_key'],
-        scope=scope,
-        prn=user)
     creds.set_store(storage)
 
     return creds
